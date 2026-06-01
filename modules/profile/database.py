@@ -6,7 +6,12 @@ class ProfileDatabase:
 
         self.db = db
 
-    async def create_profile(self, user_id):
+    async def create_profile(self, user_id: str) -> None:
+        """
+        Create a new profile for the given user ID.
+        Args:
+            user_id (str): The Discord user ID to create a profile for.
+        """
 
         await self.db.execute(
             """
@@ -18,7 +23,16 @@ class ProfileDatabase:
             (user_id,),
         )
 
-    async def get_profile(self, user_id):
+    async def get_profile(self, user_id: str) -> dict | None:
+        """
+        Retrieves the profile for the given user ID.
+        Args:
+            user_id (str): The Discord user ID to retrieve the profile for.
+        Returns:
+            Row | None:
+                The profile data for the given user ID,
+                or None if no profile exists.
+        """
 
         return await self.db.fetchone(
             """
@@ -29,7 +43,13 @@ class ProfileDatabase:
             (user_id,),
         )
 
-    async def set_theme(self, user_id, theme):
+    async def set_theme(self, user_id: str, theme: str) -> None:
+        """
+        Sets the theme for the given user ID.
+        Args:
+            user_id (str): The Discord user ID to set the theme for.
+            theme (str): The theme to set for the user.
+        """
 
         await self.db.execute(
             """
@@ -40,7 +60,13 @@ class ProfileDatabase:
             (theme, user_id),
         )
 
-    async def set_description(self, user_id, description):
+    async def set_description(self, user_id: str, description: str) -> None:
+        """
+        Sets the description for the given user ID.
+        Args:
+            user_id (str): The Discord user ID to set the description for.
+            description (str): The description to set for the user.
+        """
 
         await self.db.execute(
             """
@@ -51,7 +77,13 @@ class ProfileDatabase:
             (description, user_id),
         )
 
-    async def set_house(self, user_id, house):
+    async def set_house(self, user_id: str, house: str) -> None:
+        """
+        Sets the house for the given user ID.
+        Args:
+            user_id (str): The Discord user ID to set the house for.
+            house (str): The house to set for the user.
+        """
 
         await self.db.execute(
             """
@@ -62,7 +94,13 @@ class ProfileDatabase:
             (house, user_id),
         )
 
-    async def update_badges(self, user_id, badges):
+    async def update_badges(self, user_id: str, badges: list) -> None:
+        """
+        Updates the badges for the given user ID.
+        Args:
+            user_id (str): The Discord user ID to update the badges for.
+            badges (list): The list of badges to set for the user.
+        """
 
         await self.db.execute(
             """
@@ -73,9 +111,17 @@ class ProfileDatabase:
             (json.dumps(badges), user_id),
         )
 
-    async def add_badge(self, user_id, badge):
+    async def add_badge(self, user_id: str, badge: str) -> None:
+        """
+        Adds a badge to the user's profile.
+        Args:
+            user_id (str): The Discord user ID to add the badge to.
+            badge (str): The badge to add to the user's profile.
+        """
 
         profile = await self.get_profile(user_id)
+        if not profile:
+            return
 
         badges = json.loads(profile["badges"])
 
@@ -84,9 +130,17 @@ class ProfileDatabase:
 
             await self.update_badges(user_id, badges)
 
-    async def remove_badge(self, user_id, badge):
+    async def remove_badge(self, user_id: str, badge: str) -> None:
+        """
+        Removes a badge from the user's profile.
+        Args:
+            user_id (str): The Discord user ID to remove the badge from.
+            badge (str): The badge to remove from the user's profile.
+        """
 
         profile = await self.get_profile(user_id)
+        if not profile:
+            return
 
         badges = json.loads(profile["badges"])
 

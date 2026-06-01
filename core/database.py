@@ -11,7 +11,10 @@ class DatabaseManager:
     def __init__(self):
         self.connection = None
 
-    async def connect(self):
+    async def connect(self) -> None:
+        """
+        Connect to the database and set up the connection.
+        """
 
         self.connection = await aiosqlite.connect(config.DB_PATH)
         self.connection.row_factory = aiosqlite.Row
@@ -19,28 +22,67 @@ class DatabaseManager:
 
         logger.info("Database connected")
 
-    async def close(self):
+    async def close(self) -> None:
+        """
+        Close the database connection.
+        """
 
         if self.connection:
             await self.connection.close()
             logger.info("Database closed")
 
-    async def execute(self, query, params=()):
+    async def execute(self, query: str, params: tuple = ()) -> None:
+        """
+        Execute an SQL query and commit the transaction.
+
+        Args:
+            query (str):
+                SQL statement to execute.
+
+            params (tuple):
+                Parameters used by the SQL statement.
+        """
 
         await self.connection.execute(query, params)
         await self.connection.commit()
 
-    async def fetchone(self, query, params=()):
+    async def fetchone(self, query: str, params: tuple = ()) -> aiosqlite.Row | None:
+        """
+        Fetch a single row from the result of the query.
+        Args:
+            query (str):
+                SQL statement to execute.
+            params (tuple):
+                Parameters used by the SQL statement.
+
+        Returns:
+            aiosqlite.Row | None:
+                The first matching row, or None if no row exists..
+        """
 
         async with self.connection.execute(query, params) as cursor:
             return await cursor.fetchone()
 
-    async def fetchall(self, query, params=()):
+    async def fetchall(self, query: str, params: tuple = ()) -> list[aiosqlite.Row]:
+        """
+        Fetch all rows from the result of the query.
+        Args:
+            query (str):
+                SQL statement to execute.
+            params (tuple):
+                Parameters used by the SQL statement.
+        Returns:
+            list[aiosqlite.Row]:
+                A list of all matching rows.
+        """
 
         async with self.connection.execute(query, params) as cursor:
             return await cursor.fetchall()
 
-    async def create_tables(self):
+    async def create_tables(self) -> None:
+        """
+        Create the necessary tables if they do not exist.
+        """
 
         await self.execute(
             """
